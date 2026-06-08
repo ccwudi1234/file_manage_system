@@ -223,4 +223,5 @@ MIT License
   <sub>灵感来源于 <a href="https://www.voidtools.com/">Everything</a> — 最快的 Windows 文件搜索工具</sub>
 </p>
 #   f i l e _ m a n a g e _ s y s t e m  
+ #   f i l e _ m a n a g e _ s y s t e m  
  
