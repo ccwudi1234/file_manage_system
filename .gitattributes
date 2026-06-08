@@ -1,0 +1,15 @@
+# 强制所有文本文件使用 LF 换行符（GitHub Markdown 表格渲染需要）
+* text=auto eol=lf
+*.md text eol=lf
+*.py text eol=lf
+*.json text eol=lf
+*.txt text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+
+# 二进制文件不转换
+*.ico binary
+*.png binary
+*.jpg binary
+*.exe binary
+*.pyc binary
