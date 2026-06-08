@@ -113,17 +113,17 @@ pyinstaller --onefile --windowed --name FileManager --icon=assets/icon.ico filem
 ### 界面布局
 
 ```
-┌──────────────────────────────────────────────┐
-│ [D:\Documents ▼] [📁浏览] [🔄刷新]           │ ← 路径选择栏
-├──────────────────────────────────────────────┤
-│ 🔍│ 搜索框（输入即搜，无需回车）      │⚙️│🗘│   │ ← 搜索栏
-├──────────────────────────────────────────────┤
-│ 文件名 │ 路径        │ 大小  │ 日期       │ 类型│ ← 结果表头
-│ ──────────────────────────────────────────── │
-│ (搜索结果列表，支持排序和滚动)                  │
-├──────────────────────────────────────────────┤
-│ 已找到 N 个文件 (X.XXs) │ D:\Documents       │ ← 迷你状态行
-└──────────────────────────────────────────────┘
++--------------------------------------------------+
+| [D:\Documents v] [Browse] [Refresh]               | Path Bar
++--------------------------------------------------+
+| Q> Search as you type...              [S] [M]     | Search Bar
++--------------------------------------------------+
+| Name    | Path        | Size  | Date      | Type | Header
+| --------|-------------|-------|-----------|------|
+| (search results, sortable & scrollable)            |
++--------------------------------------------------+
+| Found N files (X.XXs) | D:\Documents              | Status Bar
++--------------------------------------------------+
 ```
 
 ### 键盘快捷键
@@ -131,11 +131,11 @@ pyinstaller --onefile --windowed --name FileManager --icon=assets/icon.ico filem
 | 快捷键 | 功能 |
 |--------|------|
 | `Enter` | 打开选中文件 |
-| `↑` / `↓` | 上/下移动选中行 |
+| `Up` / `Down` | 上/下移动选中行 |
 | `Esc` | 清空搜索和结果 |
 | `Ctrl + Enter` | 打开文件所在文件夹 |
 | `Ctrl + C` | 复制文件路径到剪贴板 |
-| `Tab` | 搜索框 ↔ 结果列表切换焦点 |
+| `Tab` | 搜索框 <-> 结果列表切换焦点 |
 | `F2` | 重命名文件 |
 | `Delete` | 从结果列表移除该项 |
 | `Ctrl + E` | 导出当前结果 |
@@ -150,46 +150,55 @@ pyinstaller --onefile --windowed --name FileManager --icon=assets/icon.ico filem
 ### 五层后端架构
 
 ```
-UI 层 (main.py)
-    ↓ 请求
-SearchScheduler (search_scheduler.py)   ← 防抖 + 中断 + 状态机
-    ↓ 调度
-SearchEngine (search_engine.py)          ← 可中断遍历 + Everything 语法解析
-    ↓ 处理
-DataUtils (data_utils.py)                ← 格式化 / 分类 / 排序
-    ↓ 持久化
-HistoryManager (history_manager.py)      ← 历史记录 + 配置管理
+UI Layer (main.py)
+       |
+       v
+SearchScheduler (search_scheduler.py)   Debounce + Interrupt + State Machine
+       |
+       v
+SearchEngine (search_engine.py)          Interruptible Scan + Everything Syntax
+       |
+       v
+DataUtils (data_utils.py)                Format / Classify / Sort
+       |
+       v
+HistoryManager (history_manager.py)      History + Config Persistence
 ```
 
 ### 即时搜索数据流
 
 ```
-用户输入 → KeyRelease 事件
-    ↓
+User Input --> KeyRelease Event
+       |
+       v
 SearchScheduler.request_search()
-    ├─ 取消旧的防抖 Timer
-    ├─ 设置 stop_flag 中断旧线程
-    └─ 启动新的 300ms Timer
-        ↓ (超时或 Enter 立即触发)
-    scan_files() [daemon Thread]
-        ├─ rglob("*") 遍历目录
-        ├─ 每100个文件检查 stop_flag
-        └─ _match_keyword() 匹配
-            ↓
-    parse_file_info() 转换为字典
-        ↓
-    root.after(0, callback) 回主线程
-        ↓
-    Treeview.insert() 渲染结果 + 更新状态行
+       +-- Cancel old debounce Timer
+       +-- Set stop_flag to interrupt old thread
+       +-- Start new 300ms Timer
+              |
+              v (timeout or Enter)
+       scan_files() [daemon Thread]
+       +-- rglob("*") traverse directory
+       +-- Check stop_flag every 100 files
+       +-- _match_keyword() match each file
+              |
+              v
+       parse_file_info() convert to dict
+              |
+              v
+       root.after(0, callback) back to main thread
+              |
+              v
+       Treeview.insert() render results + update status bar
 ```
 
 ### 搜索动画系统
 
-搜索进行时三重并行动画：
+Three parallel animations during search:
 
-1. **旋转圆环** — Canvas arc 绘制蓝色加载指示器（50ms/帧）
-2. **点点动画** — 状态行 `"正在扫描..."` 循环递增（400ms/帧）
-3. **脉冲边框** — 搜索框正弦渐变呼吸灯效果（80ms/帧）
+1. **Spinning Ring** - Canvas arc blue loading indicator (50ms/frame)
+2. **Dots Animation** - Status bar "Scanning..." cycling dots (400ms/frame)
+3. **Pulse Border** - Search box sine-wave breathing glow (80ms/frame)
 
 ## 配置说明
 
@@ -220,10 +229,5 @@ MIT License
 ---
 
 <p align="center">
-  <sub>灵感来源于 <a href="https://www.voidtools.com/">Everything</a> — 最快的 Windows 文件搜索工具</sub>
+  <sub>Inspired by <a href="https://www.voidtools.com/">Everything</a> - The fastest file search tool for Windows</sub>
 </p>
-#   f i l e _ m a n a g e _ s y s t e m 
- 
- #   f i l e _ m a n a g e _ s y s t e m 
- 
- 
